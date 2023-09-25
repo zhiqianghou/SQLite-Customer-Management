@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QGridLayout, \
-	 QLineEdit, QPushButton, QMainWindow
+	 QLineEdit, QPushButton, QMainWindow, QTableWidget
 import sys
 from datetime import datetime
 from PyQt6.QtGui import QAction
@@ -20,6 +20,10 @@ class MainWindow(QMainWindow): # QMainWindow class allow more operation like too
 		help_menu_item.addAction(about_action)
 		about_action.setMenuRole(QAction.MenuRole.NoRole)
 
+		self.table = QTableWidget()
+		self.table.setColumnCount(4)
+		self.table.setHorizontalHeaderLabels(("ID","Name","Country","Mobile"))
+		self.setCentralWidget(self.table)
 
 
 
