@@ -1,9 +1,10 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QGridLayout, \
-	 QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox
+	 QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, \
+	 QToolBar
 import sys
 from datetime import datetime
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QIcon
 import sqlite3
 
 
@@ -12,12 +13,13 @@ class MainWindow(QMainWindow): # QMainWindow class allow more operation like too
 	def __init__(self):
 		super().__init__()
 		self.setWindowTitle("Patients Management System")
+		self.setMinimumSize(800,600)
 
 		file_menu_item = self.menuBar().addMenu("&File")
 		help_menu_item = self.menuBar().addMenu("&Help")
 		edit_menu_item = self.menuBar().addMenu("&Edit")
 
-		add_customer_action = QAction("Add Customer", self)
+		add_customer_action = QAction(QIcon("icons/add.png"), "Add Customer", self)
 		add_customer_action.triggered.connect(self.insert)
 		file_menu_item.addAction(add_customer_action)
 
@@ -25,7 +27,7 @@ class MainWindow(QMainWindow): # QMainWindow class allow more operation like too
 		help_menu_item.addAction(about_action)
 		about_action.setMenuRole(QAction.MenuRole.NoRole)
 
-		search_action = QAction("Search", self)
+		search_action = QAction(QIcon("icons/search.png"),"Search", self)
 		edit_menu_item.addAction(search_action)
 		search_action.triggered.connect(self.search)
 
@@ -34,6 +36,15 @@ class MainWindow(QMainWindow): # QMainWindow class allow more operation like too
 		self.table.setHorizontalHeaderLabels(("ID","Name","Country","Mobile"))
 		self.table.verticalHeader().setVisible(False)
 		self.setCentralWidget(self.table)
+
+		# Create toolbar and add elements
+		toolbar = QToolBar()
+
+		toolbar.setMovable(True)
+		self.addToolBar(toolbar)
+		toolbar.addAction(add_customer_action)
+		toolbar.addAction(search_action)
+
 
 	def load_data(self):
 		connection = sqlite3.connect("database.db")
