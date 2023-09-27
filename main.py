@@ -1,3 +1,4 @@
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QGridLayout, \
 	 QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox
 import sys
@@ -14,6 +15,7 @@ class MainWindow(QMainWindow): # QMainWindow class allow more operation like too
 
 		file_menu_item = self.menuBar().addMenu("&File")
 		help_menu_item = self.menuBar().addMenu("&Help")
+		edit_menu_item = self.menuBar().addMenu("&Edit")
 
 		add_customer_action = QAction("Add Customer", self)
 		add_customer_action.triggered.connect(self.insert)
@@ -22,6 +24,10 @@ class MainWindow(QMainWindow): # QMainWindow class allow more operation like too
 		about_action = QAction("About", self)
 		help_menu_item.addAction(about_action)
 		about_action.setMenuRole(QAction.MenuRole.NoRole)
+
+		search_action = QAction("Search", self)
+		edit_menu_item.addAction(search_action)
+		search_action.triggered.connect(self.search)
 
 		self.table = QTableWidget()
 		self.table.setColumnCount(4)
@@ -42,6 +48,11 @@ class MainWindow(QMainWindow): # QMainWindow class allow more operation like too
 	def insert(self):
 		dialog = InsertDialog()
 		dialog.exec()
+
+	def search(self):
+		dialog = SearchDialog()
+		dialog.exec()
+
 
 
 class InsertDialog(QDialog):
@@ -97,6 +108,43 @@ class InsertDialog(QDialog):
 		cursor.close()
 		connection.close()
 		main_window.load_data()
+
+
+class SearchDialog(QDialog):
+	def __init__(self):
+		super().__init__()
+		self.setWindowTitle("Search Patient")
+		self.setFixedWidth(300)
+		self.setFixedHeight(300)
+
+		# Create layout and input widget
+		layout = QVBoxLayout()
+		self.patient_name = QLineEdit()
+		self.patient_name.setPlaceholderText("Name:")
+		layout.addWidget(self.patient_name)
+
+		# Creat Button
+		button = QPushButton("Search")
+		button.clicked.connect(self.search)
+		layout.addWidget(button)
+
+		self.setLayout(layout)
+
+
+	def search(self):
+		name = self.patient_name.text()
+		connection = sqlite3.connect("database.db")
+		cursor = connection.cursor()
+		result = cursor.execute("SELECT * FROM patients WHERE name=?",
+								(name,))
+		rows = list(result)
+		print(rows)
+		items = main_window.table.findItems(name, Qt.MatchFlag.MatchContains)
+		for item in items:
+			main_window.table.item(item.row(), 1).setSelected(True)
+
+		cursor.close()
+		connection.close()
 
 
 app = QApplication(sys.argv)
