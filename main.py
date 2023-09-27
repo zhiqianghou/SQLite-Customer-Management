@@ -55,30 +55,48 @@ class InsertDialog(QDialog):
 
 		# Add customer name widget
 		label1 = QLabel("Customer Name:")
-		customer_name = QLineEdit()
-		customer_name.setPlaceholderText("Name:")
+		self.customer_name = QLineEdit()
+		self.customer_name.setPlaceholderText("Name:")
 
 		layout.addWidget(label1,0,0)
-		layout.addWidget(customer_name,0,1)
+		layout.addWidget(self.customer_name,0,1)
 
-		# Add customer country widget
+		# Add combox of customer country
 		label2 = QLabel("Customer Country:")
-		country_name = QComboBox()
+		self.country_name = QComboBox()
 		countries = ["USA", "Canada", "Mexico", "Europe", "Asia", "Others"]
-		country_name.addItems(countries)
+		self.country_name.addItems(countries)
 		layout.addWidget(label2, 1, 0)
-		layout.addWidget(country_name, 1, 1)
+		layout.addWidget(self.country_name, 1, 1)
 
+		# Add mobile widget
+		label3 = QLabel("Mobile Number:")
+		self.mobile = QLineEdit()
+		self.mobile.setPlaceholderText("Mobile Number:")
+		layout.addWidget(label3, 2, 0)
+		layout.addWidget(self.mobile,2,1)
 
-
+		# Add a submit button
+		button = QPushButton("Submit")
+		button.clicked.connect(self.add_customer)
+		layout.addWidget(button,3,0,1,2)
 
 
 		self.setLayout(layout)
 
+	def add_customer(self):
+		name = self.customer_name.text()
+		country = self.country_name.itemText(self.country_name.currentIndex())
+		mobile = self.mobile.text()
 
-
-
-
+		connection = sqlite3.connect("database.db")
+		cursor = connection.cursor()
+		cursor.execute("INSERT INTO patients (name, course, mobile) VALUES (?,?,?)",
+					   (name, country, mobile))
+		connection.commit()
+		cursor.close()
+		connection.close()
+		main_window.load_data()
 
 
 app = QApplication(sys.argv)
