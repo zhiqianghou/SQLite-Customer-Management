@@ -26,6 +26,7 @@ class MainWindow(QMainWindow): # QMainWindow class allow more operation like too
 		about_action = QAction("About", self)
 		help_menu_item.addAction(about_action)
 		about_action.setMenuRole(QAction.MenuRole.NoRole)
+		about_action.triggered.connect(self.about)
 
 		search_action = QAction(QIcon("icons/search.png"),"Search", self)
 		edit_menu_item.addAction(search_action)
@@ -95,6 +96,9 @@ class MainWindow(QMainWindow): # QMainWindow class allow more operation like too
 		dialog = DeleteDialog()
 		dialog.exec()
 
+	def about(self):
+		dialog = AboutDialog()
+		dialog.exec()
 
 class InsertDialog(QDialog):
 	def __init__(self):
@@ -291,6 +295,20 @@ class DeleteDialog(QDialog):
 		confirmation_widget.setWindowTitle("Success")
 		confirmation_widget.setText("The record has been deleted successfully!")
 		confirmation_widget.exec()
+
+
+class AboutDialog(QMessageBox):
+	def __init__(self):
+		super().__init__()
+		self.setWindowTitle("About")
+		content = """
+		This app was created by Mark Zhiqiang Hou, 
+		of a SQLite database for customer Management 
+		System. Feel free to contact me if you have
+		any question by hou.py@gmail.com
+		"""
+		self.setText(content)
+
 
 
 
