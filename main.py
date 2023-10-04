@@ -8,6 +8,14 @@ from PyQt6.QtGui import QAction, QIcon
 import sqlite3
 
 
+class DatabaseConnection:
+	def __init__(self, database_file="database.db"):
+		self.database_file = database_file
+
+	def connect(self):
+		connection = sqlite3.connect(self.database_file)
+		return connection
+
 
 class MainWindow(QMainWindow): # QMainWindow class allow more operation like toolbar, status bar et al.
 	def __init__(self):
@@ -71,7 +79,7 @@ class MainWindow(QMainWindow): # QMainWindow class allow more operation like too
 		self.statusbar.addWidget(delete_button)
 
 	def load_data(self):
-		connection = sqlite3.connect("database.db")
+		connection = DatabaseConnection().connect()
 		result = connection.execute("select * from patients")
 		self.table.setRowCount(0)
 		for row_number, row_data in enumerate(result):
@@ -145,7 +153,7 @@ class InsertDialog(QDialog):
 		country = self.country_name.itemText(self.country_name.currentIndex())
 		mobile = self.mobile.text()
 
-		connection = sqlite3.connect("database.db")
+		connection = DatabaseConnection().connect()
 		cursor = connection.cursor()
 		cursor.execute("INSERT INTO patients (name, course, mobile) VALUES (?,?,?)",
 					   (name, country, mobile))
@@ -242,7 +250,7 @@ class EditDialog(QDialog):
 		self.setLayout(layout)
 
 	def update_customer(self):
-		connection = sqlite3.connect("database.db")
+		connection = DatabaseConnection().connect()
 		cursor = connection.cursor()
 		cursor.execute("UPDATE patients SET name = ?, course = ?, mobile = ? WHERE id =?",
 					   (self.customer_name.text(),
@@ -280,7 +288,7 @@ class DeleteDialog(QDialog):
 		index = main_window.table.currentRow()
 		customer_id = main_window.table.item(index, 0).text()
 
-		connection = sqlite3.connect("database.db")
+		connection = DatabaseConnection().connect()
 		cursor = connection.cursor()
 		cursor.execute("DELETE from patients WHERE id = ?",
 					   (customer_id,))
