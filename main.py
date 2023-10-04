@@ -1,7 +1,7 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QGridLayout, \
 	 QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, \
-	 QToolBar, QStatusBar
+	 QToolBar, QStatusBar, QMessageBox
 import sys
 from datetime import datetime
 from PyQt6.QtGui import QAction, QIcon
@@ -254,8 +254,43 @@ class EditDialog(QDialog):
 
 
 class DeleteDialog(QDialog):
-	pass
+	def __init__(self):
+		super().__init__()
+		self.setWindowTitle("Delete Customer Information")
 
+		layout = QGridLayout()
+		confirmation = QLabel("Are you sure you want to delete?")
+		yes = QPushButton("Yes")
+		no = QPushButton("No")
+
+		layout.addWidget(confirmation, 0, 0, 1, 2)
+		layout.addWidget(yes, 1, 0, 1, 1)
+		layout.addWidget(no, 1, 1, 1, 1)
+		self.setLayout(layout)
+
+		yes.clicked.connect(self.delete_customer)
+
+
+	def delete_customer(self):
+		# Get index and customer_id
+		index = main_window.table.currentRow()
+		customer_id = main_window.table.item(index, 0).text()
+
+		connection = sqlite3.connect("database.db")
+		cursor = connection.cursor()
+		cursor.execute("DELETE from patients WHERE id = ?",
+					   (customer_id,))
+		connection.commit()
+		cursor.close()
+		connection.close()
+		main_window.load_data()
+
+		self.close()
+
+		confirmation_widget = QMessageBox()
+		confirmation_widget.setWindowTitle("Success")
+		confirmation_widget.setText("The record has been deleted successfully!")
+		confirmation_widget.exec()
 
 
 
